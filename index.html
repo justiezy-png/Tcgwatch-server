@@ -7,53 +7,82 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0a0a0a; color: #fff; font-family: monospace; min-height: 100vh; }
-.header { border-bottom: 1px solid #1a1a1a; padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+.header { border-bottom: 1px solid #1a1a1a; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #0a0a0a; z-index: 100; }
 .title { font-size: 22px; font-weight: 900; }
-.title span.p { color: #FFCB05; }
-.title span.m { color: #9B72CF; }
-.status-dot { width: 10px; height: 10px; border-radius: 50%; background: #00ff88; display: inline-block; margin-right: 6px; }
-.btn { padding: 10px 18px; border-radius: 8px; border: none; font-family: monospace; font-size: 12px; font-weight: 700; cursor: pointer; }
-.btn-start { background: #00ff88; color: #000; }
-.btn-stop  { background: #ff4455; color: #fff; }
-.btn-check { background: transparent; border: 1px solid #333; color: #888; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 10px; cursor: pointer; }
-.btn-buy   { background: #00ff88; color: #003; border: none; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 10px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; }
-.btn-add   { background: transparent; border: 1px dashed #444; color: #888; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 11px; cursor: pointer; }
-.card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
-.card.instock { border-color: #00ff8840; box-shadow: 0 0 20px rgba(0,255,136,0.05); }
-.badge { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 3px; display: inline-block; }
+.title .p { color: #FFCB05; }
+.title .m { color: #9B72CF; }
+.status { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 10px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; }
+.dot.online { background: #00ff88; }
+.dot.offline { background: #ff4455; animation: pulse 1.5s infinite; }
+.tabs { display: flex; border-bottom: 1px solid #1a1a1a; background: #0a0a0a; position: sticky; top: 57px; z-index: 99; }
+.tab { flex: 1; padding: 12px 8px; text-align: center; font-size: 11px; font-weight: 700; cursor: pointer; color: #555; border-bottom: 2px solid transparent; letter-spacing: 0.08em; }
+.tab.active { color: #fff; border-bottom-color: #fff; }
+.tab.pkm.active { color: #FFCB05; border-bottom-color: #FFCB05; }
+.tab.mtg.active { color: #9B72CF; border-bottom-color: #9B72CF; }
+.main { padding: 14px 14px 80px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+.interval-bar { display: flex; gap: 6px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+.interval-btn { padding: 6px 11px; border-radius: 5px; border: 1px solid #2a2a2a; background: transparent; color: #555; font-family: monospace; font-size: 10px; cursor: pointer; }
+.interval-btn.active { background: #1a1a1a; color: #fff; border-color: #9B72CF; }
+.section-title { color: #555; font-size: 10px; letter-spacing: 0.14em; font-weight: 700; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #1a1a1a; }
+.card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 10px; padding: 13px; margin-bottom: 8px; transition: border-color 0.2s; }
+.card.instock { border-color: #00ff8840; box-shadow: 0 0 16px rgba(0,255,136,0.06); }
+.card.outofstock { opacity: 0.7; }
+.card-top { display: flex; align-items: flex-start; gap: 10px; }
+.card-info { flex: 1; min-width: 0; }
+.card-name { color: #e8e8e8; font-size: 13px; font-weight: 700; margin: 5px 0 3px; line-height: 1.3; }
+.card-meta { color: #444; font-size: 10px; }
+.card-actions { display: flex; gap: 7px; margin-top: 10px; flex-wrap: wrap; }
+.badge { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 3px; display: inline-block; }
 .badge-instock    { background: #00ff88; color: #003; }
 .badge-outofstock { background: #ff4455; color: #fff; }
 .badge-unknown    { background: #2a2a2a; color: #666; }
 .badge-checking   { background: #f59e0b; color: #000; }
 .badge-error      { background: #f97316; color: #fff; }
 .badge-uncertain  { background: #6366f1; color: #fff; }
-.badge-blocked    { background: #78716c; color: #fff; }
-.tag-pkm { background: #FFCB05; color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 2px; }
-.tag-mtg { background: #9B72CF; color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 2px; }
-.toggle  { width: 38px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
-.toggle-knob { position: absolute; top: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left 0.15s; }
-.actions { display: flex; gap: 8px; margin-top: 12px; }
-.main { padding: 16px; }
-.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
-.modal { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; width: 100%; max-width: 440px; }
+.badge-blocked    { background: #555; color: #fff; }
+.tag { font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: 2px; }
+.tag-pkm { background: #FFCB05; color: #000; }
+.tag-mtg { background: #9B72CF; color: #fff; }
+.toggle { width: 36px; height: 20px; border-radius: 10px; position: relative; cursor: pointer; flex-shrink: 0; margin-top: 3px; }
+.toggle-knob { position: absolute; top: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.btn { padding: 8px 13px; border-radius: 6px; border: none; font-family: monospace; font-size: 10px; font-weight: 700; cursor: pointer; letter-spacing: 0.06em; }
+.btn-check { background: transparent; border: 1px solid #2a2a2a; color: #777; }
+.btn-check:disabled { color: #333; cursor: default; }
+.btn-buy { background: #00ff88; color: #003300; text-decoration: none; display: inline-block; animation: pulse 2s infinite; }
+.btn-start { background: #00ff88; color: #000; padding: 10px 18px; font-size: 11px; border-radius: 8px; }
+.btn-stop  { background: #ff4455; color: #fff; padding: 10px 18px; font-size: 11px; border-radius: 8px; }
+.btn-add   { background: transparent; border: 1px dashed #333; color: #666; }
+.btn-check-all { background: transparent; border: 1px solid #2a2a2a; color: #888; }
+.btn-remove { background: transparent; border: none; color: #2a2a2a; font-size: 16px; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: flex-end; justify-content: center; z-index: 999; }
+.modal { background: #141414; border-radius: 16px 16px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-size: 17px; margin-bottom: 20px; font-weight: 800; }
 .field { margin-bottom: 14px; }
-.field label { color: #666; font-size: 10px; display: block; margin-bottom: 6px; letter-spacing: 0.1em; }
-.field input, .field select { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 6px; padding: 10px 12px; color: #fff; font-family: monospace; font-size: 13px; outline: none; }
+.field label { color: #555; font-size: 10px; display: block; margin-bottom: 6px; letter-spacing: 0.1em; }
+.field input, .field select { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 11px 12px; color: #fff; font-family: monospace; font-size: 13px; outline: none; }
 .game-btns { display: flex; gap: 8px; }
-.game-btn { flex: 1; padding: 12px; border-radius: 6px; border: 2px solid #2a2a2a; background: transparent; color: #555; font-family: monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
-.game-btn.active-pkm { border-color: #FFCB05; color: #FFCB05; }
-.game-btn.active-mtg { border-color: #9B72CF; color: #9B72CF; }
-.modal-btns { display: flex; gap: 10px; margin-top: 24px; }
-.alert-log { margin-top: 24px; padding: 14px; background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 10px; }
-.toast-container { position: fixed; top: 16px; right: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: 290px; }
-.toast { padding: 14px 16px; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); cursor: pointer; }
-.interval-bar { display: flex; gap: 6px; margin-bottom: 12px; }
-.interval-btn { padding: 6px 12px; border-radius: 5px; border: 1px solid #2a2a2a; background: transparent; color: #555; font-family: monospace; font-size: 10px; cursor: pointer; }
-.interval-btn.active { background: #1a1a1a; color: #fff; border-color: #9B72CF; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-@keyframes spin { to{transform:rotate(360deg)} }
-.pulse { animation: pulse 1.5s infinite; }
+.game-btn { flex: 1; padding: 11px; border-radius: 8px; border: 2px solid #2a2a2a; background: transparent; color: #555; font-family: monospace; font-size: 11px; font-weight: 700; cursor: pointer; }
+.game-btn.ap { border-color: #FFCB05; color: #FFCB05; }
+.game-btn.am { border-color: #9B72CF; color: #9B72CF; }
+.modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+.modal-btn { flex: 1; padding: 13px; border-radius: 8px; border: none; font-family: monospace; font-size: 12px; font-weight: 700; cursor: pointer; }
+.catalog-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #141414; cursor: pointer; }
+.catalog-item:hover { background: #111; margin: 0 -4px; padding: 10px 4px; border-radius: 6px; }
+.catalog-name { flex: 1; font-size: 12px; color: #ccc; }
+.catalog-retailer { font-size: 10px; color: #444; }
+.catalog-add { background: #1a1a1a; border: 1px solid #2a2a2a; color: #888; font-family: monospace; font-size: 9px; padding: 4px 8px; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.catalog-add.added { background: rgba(0,255,136,0.1); border-color: #00ff8830; color: #00ff88; }
+.search-input { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 10px 12px; color: #fff; font-family: monospace; font-size: 13px; outline: none; margin-bottom: 14px; }
+.toast-container { position: fixed; top: 16px; right: 12px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; max-width: 280px; }
+.toast { padding: 12px 14px; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.7); cursor: pointer; animation: slideIn 0.3s ease; }
+.fab { position: fixed; bottom: 20px; right: 16px; background: #FFCB05; color: #000; border: none; border-radius: 50px; padding: 14px 20px; font-family: monospace; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(255,203,5,0.4); z-index: 90; }
+.alert-log { margin-top: 20px; }
+.empty { text-align: center; padding: 40px 0; color: #2a2a2a; font-size: 12px; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+@keyframes spin   { to{transform:rotate(360deg)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 .spin { display: inline-block; animation: spin 0.8s linear infinite; }
 </style>
 </head>
@@ -64,115 +93,265 @@ body { background: #0a0a0a; color: #fff; font-family: monospace; min-height: 100
 <div class="header">
   <div>
     <div class="title"><span class="p">TCG</span><span class="m">Watch</span></div>
-    <div style="margin-top:4px;font-size:10px;color:#555;">
-      <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">CONNECTING...</span>
+    <div class="status">
+      <div class="dot" id="statusDot"></div>
+      <span id="statusText" style="color:#888;">CONNECTING...</span>
     </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;">
-    <span id="inStockBadge" style="display:none;color:#00ff88;font-size:11px;font-weight:700;" class="pulse"></span>
+    <span id="inStockBadge" style="display:none;color:#00ff88;font-size:11px;font-weight:700;animation:pulse 1.5s infinite;"></span>
     <button class="btn btn-start" id="monitorBtn" onclick="toggleMonitor()">START</button>
   </div>
 </div>
 
+<div class="tabs">
+  <div class="tab active" id="tab-watchlist" onclick="showTab('watchlist')">WATCHLIST</div>
+  <div class="tab pkm" id="tab-pokemon" onclick="showTab('pokemon')">POKEMON</div>
+  <div class="tab mtg" id="tab-mtg" onclick="showTab('mtg')">MTG</div>
+  <div class="tab" id="tab-log" onclick="showTab('log')">ALERTS</div>
+</div>
+
 <div class="main">
-  <div class="toolbar">
-    <span style="font-size:13px;font-weight:700;" id="watchlistLabel">WATCHLIST</span>
-    <div style="display:flex;gap:8px;">
-      <button class="btn-check" onclick="checkAll()">CHECK ALL</button>
-      <button class="btn-add" onclick="showAddModal()">+ ADD</button>
+  <!-- WATCHLIST TAB -->
+  <div id="view-watchlist">
+    <div class="toolbar">
+      <span style="font-size:12px;font-weight:700;" id="watchlistLabel">MY WATCHLIST</span>
+      <div style="display:flex;gap:7px;">
+        <button class="btn btn-check-all" onclick="checkAll()">CHECK ALL</button>
+      </div>
     </div>
+    <div class="interval-bar">
+      <span style="color:#555;font-size:10px;">Every:</span>
+      <button class="interval-btn active" onclick="setInt(1,this)">1m</button>
+      <button class="interval-btn" onclick="setInt(5,this)">5m</button>
+      <button class="interval-btn" onclick="setInt(10,this)">10m</button>
+      <button class="interval-btn" onclick="setInt(30,this)">30m</button>
+    </div>
+    <div id="productList"></div>
   </div>
 
-  <div class="interval-bar">
-    <span style="color:#555;font-size:10px;line-height:28px;">Every:</span>
-    <button class="interval-btn active" onclick="setInterval_(1,this)">1m</button>
-    <button class="interval-btn" onclick="setInterval_(5,this)">5m</button>
-    <button class="interval-btn" onclick="setInterval_(10,this)">10m</button>
-    <button class="interval-btn" onclick="setInterval_(30,this)">30m</button>
+  <!-- POKEMON CATALOG TAB -->
+  <div id="view-pokemon" style="display:none;">
+    <input class="search-input" placeholder="Search Pokemon products..." oninput="renderCatalog('pokemon',this.value)">
+    <div id="catalog-pokemon"></div>
   </div>
 
-  <div id="productList"></div>
+  <!-- MTG CATALOG TAB -->
+  <div id="view-mtg" style="display:none;">
+    <input class="search-input" placeholder="Search MTG products..." oninput="renderCatalog('mtg',this.value)">
+    <div id="catalog-mtg"></div>
+  </div>
 
-  <div class="alert-log">
-    <div style="color:#555;font-size:10px;letter-spacing:0.12em;margin-bottom:10px;font-weight:700;">ALERT LOG</div>
-    <div id="alertLog" style="max-height:200px;overflow-y:auto;">
-      <div style="color:#333;font-size:11px;">No alerts yet</div>
-    </div>
+  <!-- ALERTS TAB -->
+  <div id="view-log" style="display:none;">
+    <div class="section-title">STOCK ALERT HISTORY</div>
+    <div id="alertLogView"></div>
   </div>
 </div>
 
+<button class="fab" onclick="showAddModal()">+ ADD CUSTOM</button>
+
 <!-- Add Modal -->
-<div class="modal-bg" id="addModal" style="display:none;">
-  <div class="modal">
-    <h2 style="font-size:18px;margin-bottom:20px;font-weight:800;">Add Product</h2>
+<div class="modal-bg" id="addModal" style="display:none;" onclick="hideAddModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>Add Custom Product</h2>
     <div class="field">
       <label>PRODUCT NAME</label>
       <input type="text" id="newName" placeholder="e.g. Prismatic Evolutions ETB">
     </div>
     <div class="field">
       <label>PRODUCT URL</label>
-      <input type="url" id="newUrl" placeholder="https://www.target.com/p/...">
+      <input type="url" id="newUrl" placeholder="https://...">
     </div>
     <div class="field">
       <label>GAME</label>
       <div class="game-btns">
-        <button class="game-btn active-pkm" id="btnPkm" onclick="selectGame('pokemon')">POKEMON</button>
-        <button class="game-btn" id="btnMtg" onclick="selectGame('mtg')">MTG</button>
+        <button class="game-btn ap" id="btnPkm" onclick="selGame('pokemon')">POKEMON</button>
+        <button class="game-btn" id="btnMtg" onclick="selGame('mtg')">MTG</button>
       </div>
     </div>
     <div class="field">
       <label>RETAILER</label>
       <select id="newRetailer">
-        <option value="">Select retailer...</option>
-        <option>Pokemon Center</option>
-        <option>Target</option>
-        <option>Walmart</option>
-        <option>Best Buy</option>
-        <option>GameStop</option>
-        <option>Amazon</option>
-        <option>TCGPlayer</option>
-        <option>Card Kingdom</option>
-        <option>Star City Games</option>
-        <option>Channel Fireball</option>
+        <option value="">Select...</option>
+        <optgroup label="Pokemon">
+          <option>Pokemon Center</option>
+          <option>Target</option>
+          <option>Walmart</option>
+          <option>Best Buy</option>
+          <option>GameStop</option>
+          <option>Amazon</option>
+          <option>Costco</option>
+          <option>Sam's Club</option>
+        </optgroup>
+        <optgroup label="MTG">
+          <option>TCGPlayer</option>
+          <option>Card Kingdom</option>
+          <option>Star City Games</option>
+          <option>Channel Fireball</option>
+          <option>Face to Face Games</option>
+          <option>Miniature Market</option>
+          <option>Amazon</option>
+        </optgroup>
       </select>
     </div>
     <div class="modal-btns">
-      <button class="btn" style="flex:1;background:transparent;border:1px solid #2a2a2a;color:#666;" onclick="hideAddModal()">CANCEL</button>
-      <button class="btn" style="flex:2;background:#FFCB05;color:#000;" onclick="addProduct()">ADD TO WATCHLIST</button>
+      <button class="modal-btn" style="background:#1a1a1a;color:#666;" onclick="hideAddModal()">CANCEL</button>
+      <button class="modal-btn" style="background:#FFCB05;color:#000;" onclick="addCustom()">ADD</button>
     </div>
   </div>
 </div>
 
 <script>
-var products = [
-  { id:1, name:"Prismatic Evolutions ETB", game:"pokemon", url:"https://www.pokemoncenter.com/product/290-80506/pokemon-tcg-scarlet-violet-prismatic-evolutions-elite-trainer-box", retailer:"Pokemon Center", status:"unknown", enabled:true, lastChecked:null },
-  { id:2, name:"Surging Sparks Booster Box", game:"pokemon", url:"https://www.target.com/p/pokemon-trading-card-game-surging-sparks-booster-box/-/A-93472018", retailer:"Target", status:"unknown", enabled:true, lastChecked:null },
-  { id:3, name:"Bloomburrow Booster Box", game:"mtg", url:"https://www.cardkingdom.com/magic/bloomburrow/booster-boxes", retailer:"Card Kingdom", status:"unknown", enabled:true, lastChecked:null },
-  { id:4, name:"Outlaws of Thunder Junction", game:"mtg", url:"https://www.tcgplayer.com/search/magic/outlaws-of-thunder-junction", retailer:"TCGPlayer", status:"unknown", enabled:false, lastChecked:null }
-];
+// ── Full Product Catalog ─────────────────────────────────────────────────────
+var CATALOG = {
+  pokemon: [
+    // Scarlet & Violet Era
+    { name:"Prismatic Evolutions Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-80506" },
+    { name:"Prismatic Evolutions Booster Bundle", retailer:"Target", url:"https://www.target.com/s?searchTerm=prismatic+evolutions+booster+bundle" },
+    { name:"Prismatic Evolutions Booster Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/category/booster-boxes" },
+    { name:"Surging Sparks Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85323" },
+    { name:"Surging Sparks Booster Box", retailer:"Target", url:"https://www.target.com/s?searchTerm=surging+sparks+booster+box" },
+    { name:"Surging Sparks Booster Bundle", retailer:"Walmart", url:"https://www.walmart.com/search?q=surging+sparks+booster+bundle" },
+    { name:"Stellar Crown Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85289" },
+    { name:"Stellar Crown Booster Box", retailer:"Best Buy", url:"https://www.bestbuy.com/site/searchpage.jsp?st=stellar+crown+booster+box" },
+    { name:"Shrouded Fable Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85267" },
+    { name:"Twilight Masquerade Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85236" },
+    { name:"Twilight Masquerade Booster Box", retailer:"Target", url:"https://www.target.com/s?searchTerm=twilight+masquerade+booster+box" },
+    { name:"Temporal Forces Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85202" },
+    { name:"Paradox Rift Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85162" },
+    { name:"Paradox Rift Booster Box", retailer:"Walmart", url:"https://www.walmart.com/search?q=paradox+rift+booster+box" },
+    { name:"Obsidian Flames Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85119" },
+    { name:"Paldea Evolved Booster Box", retailer:"Amazon", url:"https://www.amazon.com/s?k=paldea+evolved+booster+box" },
+    { name:"Scarlet & Violet Base Booster Box", retailer:"GameStop", url:"https://www.gamestop.com/search/#q=scarlet+violet+booster+box" },
+    // Special Sets
+    { name:"151 Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85153" },
+    { name:"151 Booster Bundle", retailer:"Target", url:"https://www.target.com/s?searchTerm=pokemon+151+booster+bundle" },
+    { name:"Paldean Fates Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85191" },
+    { name:"Crown Zenith Elite Trainer Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85087" },
+    // Popular Collections
+    { name:"Charizard ex Super Premium Collection", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85145" },
+    { name:"Mew ex Premium Collection", retailer:"Target", url:"https://www.target.com/s?searchTerm=mew+ex+premium+collection" },
+    { name:"Pikachu ex Box", retailer:"Walmart", url:"https://www.walmart.com/search?q=pikachu+ex+box" },
+    { name:"Mewtwo ex Box", retailer:"GameStop", url:"https://www.gamestop.com/search/#q=mewtwo+ex+box" },
+    { name:"Eevee Grove Box", retailer:"Pokemon Center", url:"https://www.pokemoncenter.com/product/290-85310" },
+    // Tins & Smaller Products
+    { name:"Pokemon TCG Collector Chest", retailer:"Target", url:"https://www.target.com/s?searchTerm=pokemon+collector+chest" },
+    { name:"Battle Academy Box Set", retailer:"Walmart", url:"https://www.walmart.com/search?q=pokemon+battle+academy" },
+    { name:"Build and Battle Stadium", retailer:"Best Buy", url:"https://www.bestbuy.com/site/searchpage.jsp?st=pokemon+build+battle+stadium" },
+  ],
+  mtg: [
+    // 2024-2025 Sets
+    { name:"Aetherdrift Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/aetherdrift" },
+    { name:"Aetherdrift Commander Deck", retailer:"TCGPlayer", url:"https://www.tcgplayer.com/search/magic/aetherdrift" },
+    { name:"Foundations Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/foundations" },
+    { name:"Foundations Starter Kit", retailer:"Amazon", url:"https://www.amazon.com/s?k=magic+foundations+starter+kit" },
+    { name:"Duskmourn Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/duskmourn-house-of-horror" },
+    { name:"Duskmourn Commander Deck", retailer:"TCGPlayer", url:"https://www.tcgplayer.com/search/magic/duskmourn-house-of-horror" },
+    { name:"Bloomburrow Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/bloomburrow/booster-boxes" },
+    { name:"Bloomburrow Commander Deck", retailer:"Star City Games", url:"https://starcitygames.com/search/#q=bloomburrow+commander" },
+    { name:"Modern Horizons 3 Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/modern-horizons-3" },
+    { name:"Modern Horizons 3 Commander Deck", retailer:"TCGPlayer", url:"https://www.tcgplayer.com/search/magic/modern-horizons-3" },
+    { name:"Outlaws of Thunder Junction Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/outlaws-of-thunder-junction" },
+    { name:"Outlaws Commander Deck", retailer:"Star City Games", url:"https://starcitygames.com/search/#q=outlaws+thunder+junction+commander" },
+    { name:"Murders at Karlov Manor Booster Box", retailer:"Channel Fireball", url:"https://www.channelfireball.com/search/?query=karlov+manor+booster" },
+    { name:"Fallout Commander Deck", retailer:"TCGPlayer", url:"https://www.tcgplayer.com/search/magic/fallout" },
+    { name:"Ravnica Remastered Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/ravnica-remastered" },
+    // Popular Products
+    { name:"The Lord of the Rings Bundle", retailer:"Amazon", url:"https://www.amazon.com/s?k=magic+lord+of+the+rings+bundle" },
+    { name:"Doctor Who Commander Deck", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic/doctor-who" },
+    { name:"Assassin's Creed Booster Box", retailer:"TCGPlayer", url:"https://www.tcgplayer.com/search/magic/assassins-creed" },
+    { name:"Final Fantasy Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic" },
+    { name:"Universes Beyond Warhammer 40K", retailer:"Star City Games", url:"https://starcitygames.com/search/#q=warhammer+40k+commander" },
+    // Sealed Bundles & Collections
+    { name:"MTG Collector Booster Box", retailer:"Channel Fireball", url:"https://www.channelfireball.com/search/?query=collector+booster+box" },
+    { name:"MTG Set Booster Box", retailer:"Miniature Market", url:"https://www.miniaturemarket.com/catalogsearch/result/?q=set+booster+box+magic" },
+    { name:"MTG Play Booster Box", retailer:"Card Kingdom", url:"https://www.cardkingdom.com/magic" },
+    { name:"Starter Commander Deck", retailer:"Amazon", url:"https://www.amazon.com/s?k=magic+starter+commander+deck" },
+    { name:"Secret Lair Drop", retailer:"Wizards of the Coast", url:"https://secretlair.wizards.com" },
+  ]
+};
 
+var watchlist = [];
 var alertLog = [];
 var isMonitoring = false;
 var monitorTimer = null;
 var intervalMins = 1;
-var selectedGame = "pokemon";
+var selGameVal = "pokemon";
+var currentTab = "watchlist";
+var addedToWatchlist = {};
 
-function setInterval_(mins, btn) {
+function showTab(tab) {
+  currentTab = tab;
+  ["watchlist","pokemon","mtg","log"].forEach(function(t) {
+    document.getElementById("view-" + t).style.display = t === tab ? "block" : "none";
+    var el = document.getElementById("tab-" + t);
+    el.className = "tab" + (t === "pokemon" ? " pkm" : t === "mtg" ? " mtg" : "") + (t === tab ? " active" : "");
+  });
+  if (tab === "pokemon") renderCatalog("pokemon", "");
+  if (tab === "mtg") renderCatalog("mtg", "");
+  if (tab === "log") renderAlertLog();
+}
+
+function renderCatalog(game, search) {
+  var items = CATALOG[game].filter(function(p) {
+    return !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.retailer.toLowerCase().includes(search.toLowerCase());
+  });
+  var retailers = {};
+  items.forEach(function(p) {
+    if (!retailers[p.retailer]) retailers[p.retailer] = [];
+    retailers[p.retailer].push(p);
+  });
+  var html = "";
+  Object.keys(retailers).sort().forEach(function(retailer) {
+    html += '<div class="section-title">' + retailer.toUpperCase() + '</div>';
+    retailers[retailer].forEach(function(p) {
+      var key = game + "|" + p.name + "|" + p.retailer;
+      var isAdded = !!addedToWatchlist[key];
+      html += '<div class="catalog-item">' +
+        '<span class="tag tag-' + (game === "pokemon" ? "pkm" : "mtg") + '">' + (game === "pokemon" ? "PKM" : "MTG") + '</span>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="catalog-name">' + p.name + '</div>' +
+          '<div class="catalog-retailer">' + p.retailer + '</div>' +
+        '</div>' +
+        '<a href="' + p.url + '" target="_blank" class="btn btn-buy" style="font-size:9px;padding:5px 8px;margin-right:6px;animation:none;">VISIT</a>' +
+        '<button class="catalog-add' + (isAdded ? " added" : "") + '" onclick="addFromCatalog(\'' + key.replace(/'/g, "\\'") + '\',\'' + game + '\')">' + (isAdded ? "ADDED" : "+ WATCH") + '</button>' +
+      '</div>';
+    });
+  });
+  if (!html) html = '<div class="empty">No products found</div>';
+  document.getElementById("catalog-" + game).innerHTML = html;
+}
+
+function addFromCatalog(key, game) {
+  var parts = key.split("|");
+  var name = parts[1];
+  var retailer = parts[2];
+  var item = CATALOG[game].find(function(p) { return p.name === name && p.retailer === retailer; });
+  if (!item) return;
+  if (!addedToWatchlist[key]) {
+    watchlist.push({ id: Date.now() + Math.random(), name: item.name, game: game, url: item.url, retailer: item.retailer, status: "unknown", enabled: true, lastChecked: null });
+    addedToWatchlist[key] = true;
+    renderCatalog(game, "");
+    renderWatchlist();
+  }
+}
+
+function setInt(mins, btn) {
   intervalMins = mins;
-  document.querySelectorAll('.interval-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  if (isMonitoring) { clearInterval(monitorTimer); startMonitorLoop(); }
+  document.querySelectorAll(".interval-btn").forEach(function(b) { b.classList.remove("active"); });
+  btn.classList.add("active");
+  if (isMonitoring) { clearInterval(monitorTimer); startLoop(); }
 }
 
 function toggleMonitor() {
   isMonitoring = !isMonitoring;
-  var btn = document.getElementById('monitorBtn');
+  var btn = document.getElementById("monitorBtn");
   if (isMonitoring) {
     btn.textContent = "STOP";
     btn.className = "btn btn-stop";
     checkAll();
-    startMonitorLoop();
+    startLoop();
   } else {
     btn.textContent = "START";
     btn.className = "btn btn-start";
@@ -180,181 +359,203 @@ function toggleMonitor() {
   }
 }
 
-function startMonitorLoop() {
-  monitorTimer = setInterval(function() { checkAll(); }, intervalMins * 60 * 1000);
+function startLoop() {
+  monitorTimer = setInterval(checkAll, intervalMins * 60 * 1000);
 }
 
 function checkAll() {
-  products.filter(function(p) { return p.enabled; }).forEach(function(p, i) {
-    setTimeout(function() { checkProduct(p.id); }, i * 800);
+  watchlist.filter(function(p) { return p.enabled; }).forEach(function(p, i) {
+    setTimeout(function() { doCheck(p.id); }, i * 900);
   });
 }
 
-function checkProduct(id) {
-  var product = products.find(function(p) { return p.id === id; });
-  if (!product) return;
-  product.status = "checking";
-  render();
-
+function doCheck(id) {
+  var p = watchlist.find(function(x) { return x.id === id; });
+  if (!p) return;
+  p.status = "checking";
+  renderWatchlist();
   fetch("/check", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url: product.url })
+    body: JSON.stringify({ url: p.url })
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
     var now = new Date().toLocaleTimeString();
-    if (!data.success) product.status = "error";
-    else if (data.inStock === true) product.status = "instock";
-    else if (data.inStock === false) product.status = "outofstock";
-    else product.status = "uncertain";
-    product.lastChecked = now;
-    if (product.status === "instock") fireAlert(product);
-    render();
+    if (!data.success) p.status = "error";
+    else if (data.inStock === true) p.status = "instock";
+    else if (data.inStock === false) p.status = "outofstock";
+    else p.status = "uncertain";
+    p.lastChecked = now;
+    if (p.status === "instock") fireAlert(p);
+    renderWatchlist();
   })
-  .catch(function() {
-    product.status = "error";
-    render();
-  });
+  .catch(function() { p.status = "error"; renderWatchlist(); });
 }
 
-function fireAlert(product) {
+function fireAlert(p) {
   var now = new Date().toLocaleTimeString();
-  alertLog.unshift({ name: product.name, retailer: product.retailer, time: now, url: product.url, game: product.game });
-  showToast(product);
+  alertLog.unshift({ name: p.name, retailer: p.retailer, time: now, url: p.url, game: p.game });
+  showToast(p);
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var notes = product.game === "pokemon" ? [880, 1108, 1318] : [523, 659, 784];
+    var notes = p.game === "pokemon" ? [880, 1108, 1318] : [523, 659, 784];
     notes.forEach(function(freq, i) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, ctx.currentTime + i*0.12);
-      gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i*0.12 + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.12 + 0.25);
-      osc.start(ctx.currentTime + i*0.12);
-      osc.stop(ctx.currentTime + i*0.12 + 0.3);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0, ctx.currentTime + i*0.12);
+      g.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i*0.12 + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.12 + 0.25);
+      o.start(ctx.currentTime + i*0.12);
+      o.stop(ctx.currentTime + i*0.12 + 0.3);
     });
   } catch(e) {}
+  if (Notification.permission === "granted") {
+    new Notification("IN STOCK: " + p.name, { body: p.retailer });
+  }
 }
 
-function showToast(product) {
-  var container = document.getElementById('toasts');
-  var toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.style.background = product.game === 'pokemon' ? '#FFCB05' : '#9B72CF';
-  toast.style.color = product.game === 'pokemon' ? '#000' : '#fff';
-  toast.innerHTML = '<div style="font-size:11px;font-weight:700;opacity:0.7;margin-bottom:4px;">STOCK ALERT</div>' +
-    '<div style="font-size:14px;font-weight:700;">' + product.name + '</div>' +
-    '<div style="font-size:11px;opacity:0.8;margin-top:4px;">' + product.retailer + '</div>';
-  toast.onclick = function() { container.removeChild(toast); };
-  container.appendChild(toast);
-  setTimeout(function() { if (toast.parentNode) container.removeChild(toast); }, 10000);
+function showToast(p) {
+  var c = document.getElementById("toasts");
+  var t = document.createElement("div");
+  t.className = "toast";
+  t.style.background = p.game === "pokemon" ? "#FFCB05" : "#9B72CF";
+  t.style.color = p.game === "pokemon" ? "#000" : "#fff";
+  t.innerHTML = '<div style="font-size:10px;font-weight:700;opacity:0.7;margin-bottom:3px;">STOCK ALERT</div>' +
+    '<div style="font-size:13px;font-weight:700;">' + p.name + '</div>' +
+    '<div style="font-size:10px;opacity:0.8;margin-top:3px;">' + p.retailer + '</div>' +
+    '<a href="' + p.url + '" target="_blank" style="display:inline-block;margin-top:8px;background:rgba(0,0,0,0.2);color:inherit;text-decoration:none;padding:5px 10px;border-radius:5px;font-size:10px;font-weight:700;">BUY NOW</a>';
+  t.onclick = function() { if (c.contains(t)) c.removeChild(t); };
+  c.appendChild(t);
+  setTimeout(function() { if (c.contains(t)) c.removeChild(t); }, 12000);
 }
 
 function toggleProduct(id) {
-  var p = products.find(function(x) { return x.id === id; });
-  if (p) { p.enabled = !p.enabled; render(); }
+  var p = watchlist.find(function(x) { return x.id === id; });
+  if (p) { p.enabled = !p.enabled; renderWatchlist(); }
 }
 
 function removeProduct(id) {
-  products = products.filter(function(x) { return x.id !== id; });
-  render();
+  var p = watchlist.find(function(x) { return x.id === id; });
+  if (p) {
+    var key = p.game + "|" + p.name + "|" + p.retailer;
+    delete addedToWatchlist[key];
+  }
+  watchlist = watchlist.filter(function(x) { return x.id !== id; });
+  renderWatchlist();
 }
 
-function selectGame(game) {
-  selectedGame = game;
-  document.getElementById('btnPkm').className = 'game-btn' + (game === 'pokemon' ? ' active-pkm' : '');
-  document.getElementById('btnMtg').className = 'game-btn' + (game === 'mtg' ? ' active-mtg' : '');
+function selGame(g) {
+  selGameVal = g;
+  document.getElementById("btnPkm").className = "game-btn" + (g === "pokemon" ? " ap" : "");
+  document.getElementById("btnMtg").className = "game-btn" + (g === "mtg" ? " am" : "");
 }
 
-function showAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-function hideAddModal() { document.getElementById('addModal').style.display = 'none'; }
+function showAddModal() { document.getElementById("addModal").style.display = "flex"; }
+function hideAddModal() { document.getElementById("addModal").style.display = "none"; }
 
-function addProduct() {
-  var name = document.getElementById('newName').value.trim();
-  var url = document.getElementById('newUrl').value.trim();
-  var retailer = document.getElementById('newRetailer').value;
-  if (!name || !url || !retailer) return;
-  products.push({ id: Date.now(), name: name, game: selectedGame, url: url, retailer: retailer, status: 'unknown', enabled: true, lastChecked: null });
-  document.getElementById('newName').value = '';
-  document.getElementById('newUrl').value = '';
-  document.getElementById('newRetailer').value = '';
+function addCustom() {
+  var name = document.getElementById("newName").value.trim();
+  var url = document.getElementById("newUrl").value.trim();
+  var retailer = document.getElementById("newRetailer").value;
+  if (!name || !url || !retailer) { alert("Please fill in all fields"); return; }
+  watchlist.push({ id: Date.now(), name: name, game: selGameVal, url: url, retailer: retailer, status: "unknown", enabled: true, lastChecked: null });
+  document.getElementById("newName").value = "";
+  document.getElementById("newUrl").value = "";
+  document.getElementById("newRetailer").value = "";
   hideAddModal();
-  render();
+  showTab("watchlist");
+  renderWatchlist();
 }
 
-function badgeClass(status) {
-  var map = { instock:'badge-instock', outofstock:'badge-outofstock', unknown:'badge-unknown', checking:'badge-checking', error:'badge-error', uncertain:'badge-uncertain', blocked:'badge-blocked' };
-  return 'badge ' + (map[status] || 'badge-unknown');
+function badgeCls(s) {
+  return "badge badge-" + (s || "unknown");
+}
+function badgeLbl(s) {
+  var m = { instock:"IN STOCK", outofstock:"OUT OF STOCK", unknown:"UNCHECKED", checking:"CHECKING...", error:"ERROR", uncertain:"UNCERTAIN", blocked:"BLOCKED" };
+  return m[s] || "UNKNOWN";
 }
 
-function badgeLabel(status) {
-  var map = { instock:'IN STOCK', outofstock:'OUT OF STOCK', unknown:'UNCHECKED', checking:'CHECKING...', error:'ERROR', uncertain:'UNCERTAIN', blocked:'BLOCKED' };
-  return map[status] || 'UNKNOWN';
-}
+function renderWatchlist() {
+  var inStock = watchlist.filter(function(p) { return p.status === "instock"; }).length;
+  var badge = document.getElementById("inStockBadge");
+  if (inStock > 0) { badge.style.display = "inline"; badge.textContent = inStock + " IN STOCK!"; }
+  else badge.style.display = "none";
+  document.getElementById("watchlistLabel").textContent = "MY WATCHLIST (" + watchlist.length + ")";
 
-function render() {
-  var inStockCount = products.filter(function(p) { return p.status === 'instock'; }).length;
-  var badge = document.getElementById('inStockBadge');
-  if (inStockCount > 0) { badge.style.display = 'inline'; badge.textContent = inStockCount + ' IN STOCK'; }
-  else { badge.style.display = 'none'; }
-
-  var list = document.getElementById('productList');
-  if (products.length === 0) { list.innerHTML = '<div style="text-align:center;padding:60px 0;color:#2a2a2a;">No products - tap + ADD</div>'; return; }
-
-  list.innerHTML = products.map(function(p) {
-    var toggleBg = p.enabled ? (p.game === 'pokemon' ? '#FFCB05' : '#9B72CF') : '#222';
-    var knobLeft = p.enabled ? '19px' : '3px';
-    var cardClass = 'card' + (p.status === 'instock' ? ' instock' : '');
-    var buyBtn = p.status === 'instock' ? '<a href="' + p.url + '" target="_blank" class="btn-buy pulse">BUY NOW</a>' : '';
-    var checkLabel = p.status === 'checking' ? '<span class="spin">...</span>' : 'CHECK NOW';
-    return '<div class="' + cardClass + '" style="opacity:' + (p.enabled ? '1' : '0.45') + ';">' +
-      '<div style="display:flex;align-items:flex-start;gap:12px;">' +
-        '<div class="toggle" style="background:' + toggleBg + ';margin-top:2px;" onclick="toggleProduct(' + p.id + ')">' +
-          '<div class="toggle-knob" style="left:' + knobLeft + ';"></div>' +
+  var list = document.getElementById("productList");
+  if (watchlist.length === 0) {
+    list.innerHTML = '<div class="empty">No products yet<br><br>Browse the POKEMON or MTG tabs to add products</div>';
+    return;
+  }
+  list.innerHTML = watchlist.map(function(p) {
+    var tBg = p.enabled ? (p.game === "pokemon" ? "#FFCB05" : "#9B72CF") : "#222";
+    var kLeft = p.enabled ? "18px" : "2px";
+    var buyBtn = p.status === "instock"
+      ? '<a href="' + p.url + '" target="_blank" class="btn btn-buy">BUY NOW</a>'
+      : '<a href="' + p.url + '" target="_blank" class="btn btn-check" style="text-decoration:none;">VISIT SITE</a>';
+    var chkLbl = p.status === "checking" ? '<span class="spin">...</span>' : "CHECK";
+    return '<div class="card ' + (p.status === "instock" ? "instock" : p.status === "outofstock" ? "outofstock" : "") + '" style="opacity:' + (p.enabled ? "1" : "0.45") + ';">' +
+      '<div class="card-top">' +
+        '<div class="toggle" style="background:' + tBg + ';" onclick="toggleProduct(' + p.id + ')">' +
+          '<div class="toggle-knob" style="left:' + kLeft + ';"></div>' +
         '</div>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">' +
-            '<span class="' + (p.game === 'pokemon' ? 'tag-pkm' : 'tag-mtg') + '">' + (p.game === 'pokemon' ? 'PKM' : 'MTG') + '</span>' +
-            '<span class="' + badgeClass(p.status) + '">' + badgeLabel(p.status) + '</span>' +
+        '<div class="card-info">' +
+          '<div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">' +
+            '<span class="tag tag-' + (p.game === "pokemon" ? "pkm" : "mtg") + '">' + (p.game === "pokemon" ? "PKM" : "MTG") + '</span>' +
+            '<span class="' + badgeCls(p.status) + '">' + badgeLbl(p.status) + '</span>' +
           '</div>' +
-          '<div style="color:#e8e8e8;font-size:14px;font-weight:700;margin-bottom:4px;">' + p.name + '</div>' +
-          '<div style="color:#444;font-size:11px;">' + p.retailer + (p.lastChecked ? ' | ' + p.lastChecked : '') + '</div>' +
+          '<div class="card-name">' + p.name + '</div>' +
+          '<div class="card-meta">' + p.retailer + (p.lastChecked ? " · " + p.lastChecked : "") + '</div>' +
         '</div>' +
-        '<button onclick="removeProduct(' + p.id + ')" style="background:transparent;border:none;color:#333;font-size:18px;cursor:pointer;padding:0 4px;">x</button>' +
+        '<button class="btn-remove" onclick="removeProduct(' + p.id + ')">×</button>' +
       '</div>' +
-      '<div class="actions">' +
-        '<button class="btn-check" onclick="checkProduct(' + p.id + ')">' + checkLabel + '</button>' +
+      '<div class="card-actions">' +
+        '<button class="btn btn-check" onclick="doCheck(' + p.id + ')" ' + (p.status === "checking" ? "disabled" : "") + '>' + chkLbl + '</button>' +
         buyBtn +
       '</div>' +
     '</div>';
-  }).join('');
-
-  var logEl = document.getElementById('alertLog');
-  if (alertLog.length === 0) { logEl.innerHTML = '<div style="color:#333;font-size:11px;">No alerts yet</div>'; return; }
-  logEl.innerHTML = alertLog.slice(0, 20).map(function(a) {
-    return '<a href="' + a.url + '" target="_blank" style="display:block;padding:8px 0;border-bottom:1px solid #1a1a1a;text-decoration:none;">' +
-      '<div style="color:#00ff88;font-size:9px;font-weight:700;">IN STOCK</div>' +
-      '<div style="color:#bbb;font-size:11px;">' + a.name + '</div>' +
-      '<div style="color:#444;font-size:10px;">' + a.time + '</div>' +
-    '</a>';
-  }).join('');
+  }).join("");
 }
 
-// Health check
-fetch("/health").then(function(r) { return r.json(); }).then(function(d) {
-  if (d.status === "ok") {
-    document.getElementById('statusDot').style.background = '#00ff88';
-    document.getElementById('statusText').textContent = 'SERVER ONLINE';
-  }
-}).catch(function() {
-  document.getElementById('statusDot').style.background = '#ff4455';
-  document.getElementById('statusText').textContent = 'SERVER OFFLINE';
-});
+function renderAlertLog() {
+  var el = document.getElementById("alertLogView");
+  if (alertLog.length === 0) { el.innerHTML = '<div class="empty">No alerts yet<br>Start monitoring to detect stock changes</div>'; return; }
+  el.innerHTML = alertLog.map(function(a) {
+    return '<div style="padding:12px 0;border-bottom:1px solid #141414;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div>' +
+          '<div style="color:#00ff88;font-size:9px;font-weight:700;margin-bottom:3px;">IN STOCK</div>' +
+          '<div style="color:#ddd;font-size:13px;font-weight:700;">' + a.name + '</div>' +
+          '<div style="color:#555;font-size:10px;margin-top:2px;">' + a.retailer + ' · ' + a.time + '</div>' +
+        '</div>' +
+        '<a href="' + a.url + '" target="_blank" class="btn btn-buy" style="flex-shrink:0;margin-left:10px;">BUY NOW</a>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
 
-render();
+// ── Health check ──────────────────────────────────────────────────────────────
+function ping() {
+  fetch("/health")
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var ok = d.status === "ok";
+      document.getElementById("statusDot").className = "dot " + (ok ? "online" : "offline");
+      document.getElementById("statusText").textContent = ok ? "SERVER ONLINE" : "SERVER OFFLINE";
+      document.getElementById("statusText").style.color = ok ? "#00ff88" : "#ff4455";
+    })
+    .catch(function() {
+      document.getElementById("statusDot").className = "dot offline";
+      document.getElementById("statusText").textContent = "SERVER OFFLINE";
+      document.getElementById("statusText").style.color = "#ff4455";
+    });
+}
+
+ping();
+setInterval(ping, 10000);
+renderWatchlist();
 </script>
 </body>
 </html>
