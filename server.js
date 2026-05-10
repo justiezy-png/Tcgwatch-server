@@ -1,4 +1,4 @@
-7&gs_lcrpconst http = require("http");
+const http = require("http");
 const https = require("https");
 const url = require("url");
 
