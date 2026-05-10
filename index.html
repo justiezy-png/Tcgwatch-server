@@ -564,7 +564,22 @@ function ping() {
 
 ping();
 setInterval(ping, 10000);
+
+// Auto-add entire catalog to watchlist on load
+Object.keys(CATALOG).forEach(function(game) {
+  CATALOG[game].forEach(function(item) {
+    var key = game + "|" + item.name + "|" + item.retailer;
+    if (!addedToWatchlist[key]) {
+      watchlist.push({ id: Date.now() + Math.random(), name: item.name, game: game, url: item.url, retailer: item.retailer, status: "unknown", enabled: true, lastChecked: null });
+      addedToWatchlist[key] = true;
+    }
+  });
+});
+
 renderWatchlist();
+
+// Auto-start monitoring immediately
+toggleMonitor();
 </script>
 </body>
 </html>
