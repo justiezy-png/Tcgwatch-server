@@ -9,11 +9,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "*",
   "Access-Control-Max-Age": "86400",
-  "Content-Type": "application/json",
-};
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Content-Type": "application/json",
+  "Content-Type": "application/json"
 };
 
 function checkStock(productUrl, callback) {
@@ -24,48 +20,61 @@ function checkStock(productUrl, callback) {
       path: parsed.path || "/",
       method: "GET",
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "identity",
-        "Connection": "close",
+        "Connection": "close"
       },
-      timeout: 12000,
+      timeout: 12000
     };
 
-    const req = https.request(options, (res) => {
-      let data = "";
+    const req = https.request(options, function(res) {
+      var data = "";
       res.setEncoding("utf8");
-      res.on("data", (chunk) => {
+      res.on("data", function(chunk) {
         data += chunk;
         if (data.length > 500000) req.destroy();
       });
-      res.on("end", () => {
-        const text = data.toLowerCase();
-        const outKeywords = ["sold out", "out of stock", "currently unavailable", "notify me when available", "coming soon"];
-        const inKeywords = ["add to cart", "add to bag", "buy now", "in stock", "add to basket"];
-        const hasOut = outKeywords.some((t) => text.includes(t));
-        const hasIn = inKeywords.some((t) => text.includes(t));
-        let inStock = null;
+      res.on("end", function() {
+        var text = data.toLowerCase();
+        var outKeywords = ["sold out", "out of stock", "currently unavailable", "notify me when available"];
+        var inKeywords = ["add to cart", "add to bag", "buy now", "in stock"];
+        var hasOut = outKeywords.some(function(t) { return text.includes(t); });
+        var hasIn = inKeywords.some(function(t) { return text.includes(t); });
+        var inStock = null;
         if (hasOut && !hasIn) inStock = false;
         else if (hasIn && !hasOut) inStock = true;
         else if (hasIn && hasOut) inStock = false;
-        callback({ success: true, inStock, statusCode: res.statusCode, checkedAt: new Date().toISOString() });
+        callback({ success: true, inStock: inStock, statusCode: res.statusCode, checkedAt: new Date().toISOString() });
       });
     });
 
-    req.on("error", (e) => callback({ success: false, error: e.message, inStock: null, checkedAt: new Date().toISOString() }));
-    req.on("timeout", () => { req.destroy(); callback({ success: false, error: "Timed out", inStock: null, checkedAt: new Date().toISOString() }); });
+    req.on("error", function(e) {
+      callback({ success: false, error: e.message, inStock: null, checkedAt: new Date().toISOString() });
+    });
+
+    req.on("timeout", function() {
+      req.destroy();
+      callback({ success: false, error: "Timed out", inStock: null, checkedAt: new Date().toISOString() });
+    });
+
     req.end();
-  } catch (e) {
+  } catch(e) {
     callback({ success: false, error: e.message, inStock: null, checkedAt: new Date().toISOString() });
   }
 }
 
-const server = http.createServer((req, res) => {
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
+const server = http.createServer(function(req, res) {
+  Object.keys(CORS_HEADERS).forEach(function(k) {
+    res.setHeader(k, CORS_HEADERS[k]);
+  });
 
-  if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   if (req.method === "GET" && req.url === "/health") {
     res.writeHead(200);
@@ -74,34 +83,62 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === "POST" && req.url === "/check") {
-    let body = "";
-    req.on("data", (chunk) => { body += chunk; });
-    req.on("end", () => {
+    var body = "";
+    req.on("data", function(chunk) { body += chunk; });
+    req.on("end", function() {
       try {
-        const { url: productUrl } = JSON.parse(body);
-        if (!productUrl) { res.writeHead(400); res.end(JSON.stringify({ error: "url required" })); return; }
-        checkStock(productUrl, (result) => { res.writeHead(200); res.end(JSON.stringify(result)); });
-      } catch { res.writeHead(400); res.end(JSON.stringify({ error: "Invalid JSON" })); }
+        var parsed = JSON.parse(body);
+        var productUrl = parsed.url;
+        if (!productUrl) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: "url required" }));
+          return;
+        }
+        checkStock(productUrl, function(result) {
+          res.writeHead(200);
+          res.end(JSON.stringify(result));
+        });
+      } catch(e) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
+      }
     });
     return;
   }
 
   if (req.method === "POST" && req.url === "/check-batch") {
-    let body = "";
-    req.on("data", (chunk) => { body += chunk; });
-    req.on("end", () => {
+    var body = "";
+    req.on("data", function(chunk) { body += chunk; });
+    req.on("end", function() {
       try {
-        const { products } = JSON.parse(body);
-        if (!Array.isArray(products)) { res.writeHead(400); res.end(JSON.stringify({ error: "products array required" })); return; }
-        const results = {};
-        let i = 0;
+        var parsed = JSON.parse(body);
+        var products = parsed.products;
+        if (!Array.isArray(products)) {
+          res.writeHead(400);
+          res.end(JSON.stringify({ error: "products array required" }));
+          return;
+        }
+        var results = {};
+        var i = 0;
         function checkNext() {
-          if (i >= products.length) { res.writeHead(200); res.end(JSON.stringify({ results, checkedAt: new Date().toISOString() })); return; }
-          const { id, url: productUrl } = products[i++];
-          setTimeout(() => { checkStock(productUrl, (result) => { results[id] = result; checkNext(); }); }, i === 1 ? 0 : 700);
+          if (i >= products.length) {
+            res.writeHead(200);
+            res.end(JSON.stringify({ results: results, checkedAt: new Date().toISOString() }));
+            return;
+          }
+          var item = products[i++];
+          setTimeout(function() {
+            checkStock(item.url, function(result) {
+              results[item.id] = result;
+              checkNext();
+            });
+          }, i === 1 ? 0 : 700);
         }
         checkNext();
-      } catch { res.writeHead(400); res.end(JSON.stringify({ error: "Invalid JSON" })); }
+      } catch(e) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
+      }
     });
     return;
   }
@@ -110,4 +147,6 @@ const server = http.createServer((req, res) => {
   res.end(JSON.stringify({ error: "Not found" }));
 });
 
-server.listen(PORT, "0.0.0.0", () => { console.log(`TCGWatch running on port ${PORT}`); });
+server.listen(PORT, "0.0.0.0", function() {
+  console.log("TCGWatch running on port " + PORT);
+});
