@@ -1,4 +1,4 @@
-const http = require("http");
+7&gs_lcrpconst http = require("http");
 const https = require("https");
 const url = require("url");
 
@@ -142,7 +142,14 @@ const server = http.createServer(function(req, res) {
     });
     return;
   }
-
+if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
+    var fs = require("fs");
+    var html = fs.readFileSync(__dirname + "/index.html", "utf8");
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead(200);
+    res.end(html);
+    return;
+}
   res.writeHead(404);
   res.end(JSON.stringify({ error: "Not found" }));
 });
